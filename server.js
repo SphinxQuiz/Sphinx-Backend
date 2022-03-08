@@ -1,3 +1,26 @@
+require("dotenv").config();
+
+const needEnv = {
+  SPHINX_DB_URL: null,
+  SPHINX_TOKEN_KEY: null,
+};
+
+Object.keys(needEnv).forEach((env_name) => {
+  if (!process.env[env_name]) {
+    if (needEnv[env_name] === null) {
+      throw new Error("You need to provide the env variable " + env_name);
+    }
+
+    process.env[env_name] = needEnv[env_name];
+    console.log(
+      "Env variable " +
+        env_name +
+        " has been automaticly set to " +
+        needEnv[env_name]
+    );
+  }
+});
+
 const http = require("http");
 const app = require("./app");
 

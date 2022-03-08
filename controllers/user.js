@@ -35,7 +35,7 @@ exports.login = (req, res, next) => {
           }
           return res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "H6zT5kXx6Ffi6RI8rKSb", {
+            token: jwt.sign({ userId: user._id }, SPHINX_TOKEN_KEY, {
               expiresIn: "24h",
             }),
           });

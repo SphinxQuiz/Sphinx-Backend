@@ -5,10 +5,10 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/user");
 
 mongoose
-  .connect(
-    "mongodb+srv://tom:DZKFsp9UGX3KsGtd@cluster0.t45k6.mongodb.net/SphinxDB?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.SPHINX_DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch((e) => console.log("Connexion à MongoDB échouée !" + e));
 
