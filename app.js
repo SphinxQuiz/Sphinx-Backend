@@ -3,11 +3,10 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user");
-const { ppid } = require("process");
 
 mongoose
   .connect(
-    "mongodb+srv://tom:DZKFsp9UGX3KsGtd@cluster0.t45k6.mongodb.net/tutorielOpenClassroom?retryWrites=true&w=majority",
+    "mongodb+srv://tom:DZKFsp9UGX3KsGtd@cluster0.t45k6.mongodb.net/SphinxDB?retryWrites=true&w=majority",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -30,6 +29,6 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.use("/api/user", userRoutes);
+app.use("/api/auth", userRoutes);
 
 module.exports = app;
