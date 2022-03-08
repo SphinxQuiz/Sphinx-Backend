@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
+  host: "smtp.gmail.com",
   auth: {
     user: process.env.EMAIL_USERNAME,
     pass: process.env.EMAIL_PASSWORD,
@@ -22,15 +23,16 @@ exports.signup = (req, res, next) => {
         email: req.body.email,
         password: hash,
       });
-      user
-        .save()
-        .then()
-        .catch((error) => res.status(400).json({ error }));
+      user.save().catch((error) => res.status(400).send({ error }));
+
       const verificationToken = user.generateVerificationToken();
-      const url = `http://localhost:3000/api/verify/${verificationToken}`;
+      const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
+      console.log(process.env.EMAIL_USERNAME);
+
+      console.log(process.env.EMAIL_PASSWORD);
       transporter
         .sendMail({
-          to: email,
+          to: req.body.email,
           subject: "Verify Sphinx Account",
           html: `Click <a href = '${url}'>here</a> to confirm your email.`,
         })
@@ -42,6 +44,7 @@ exports.signup = (req, res, next) => {
         .catch((error) => res.status(400).send({ error }));
     })
     .catch((error) => {
+      console.log(error);
       res.status(500).send({ error });
     });
 };
@@ -50,15 +53,22 @@ exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({ error: "This user does not exist" }); // a finir;
+        return res.status(401).send({ error: "This user does not exist" }); // a finir;
       }
       bcrypt
         .compare(req.body.password, user.password)
         .then((valid) => {
-          if (!valid) {
-            return res.status(401).json({ error: "Incorrect password" });
+          try {
+            if (!valid) {
+              return res.status(401).send({ error: "Incorrect password" });
+            }
+            if (!user.verified) {
+              return res.status(403).send({ error: "Verify your account" });
+            }
+          } catch (error) {
+            return res.status(500).send({ error: "Incorrect password" });
           }
-          return res.status(200).json({
+          return res.status(200).send({
             userId: user._id,
             token: jwt.sign({ userId: user._id }, SPHINX_TOKEN_KEY, {
               expiresIn: "24h",
@@ -66,12 +76,12 @@ exports.login = (req, res, next) => {
           });
         })
 
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).send({ error }));
     })
-    .catch((error) => res.status(500).json({ error }));
+    .catch((error) => res.status(500).send({ error }));
 };
 
-exports.verify = async (req, res, next) => {
+exports.verify = (req, res, next) => {
   const { token } = req.params;
 
   if (!token) {
@@ -86,16 +96,14 @@ exports.verify = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findOne({ _id: payload.ID }).exec();
+    const user = User.findOne({ _id: payload.ID }).exec();
     if (!user) {
       return res.status(404).send({ message: "User does not exist" });
     }
 
     user.verified = true;
 
-    await user.save();
-
-    return res.status(200).send({ message: "Account verified" });
+    user.save().then(res.status(200).send({ message: "Account verified" }));
   } catch (error) {
     return res.status(500).send(error);
   }

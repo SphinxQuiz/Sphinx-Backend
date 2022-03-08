@@ -3,7 +3,7 @@ require("dotenv").config();
 const needEnv = {
   SPHINX_DB_URL: null,
   SPHINX_TOKEN_KEY: null,
-  EMAL_USERNAME: null,
+  EMAIL_USERNAME: null,
   EMAIL_PASSWORD: null,
 };
 
