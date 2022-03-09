@@ -12,41 +12,35 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.signup = (req, res, next) => {
-  console.log(req.body);
+exports.signup = async (req, res, next) => {
+  const { email, username, password } = req.body;
 
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) => {
-      const user = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: hash,
-      });
-      user.save().catch((error) => res.status(400).send({ error }));
-
-      const verificationToken = user.generateVerificationToken();
-      const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
-      console.log(process.env.EMAIL_USERNAME);
-
-      console.log(process.env.EMAIL_PASSWORD);
-      transporter
-        .sendMail({
-          to: req.body.email,
-          subject: "Verify Sphinx Account",
-          html: `Click <a href = '${url}'>here</a> to confirm your email.`,
-        })
-        .then(() =>
-          res
-            .status(201)
-            .send({ message: `Sent a verification email to ${email}` })
-        )
-        .catch((error) => res.status(400).send({ error }));
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send({ error });
+  let user;
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    user = new User({
+      username,
+      email,
+      password: hash,
     });
+    user.save();
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+
+  const verificationToken = user.generateVerificationToken();
+  const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
+
+  try {
+    await transporter.sendMail({
+      to: req.body.email,
+      subject: "Verify Sphinx Account",
+      html: `Click <a href = '${url}'>here</a> to confirm your email.`,
+    });
+  } catch (error) {
+    return res.status(400).send({ error });
+  }
+  res.status(201).send({ message: `Sent a verification email to ${email}` });
 };
 
 exports.login = (req, res, next) => {
@@ -81,9 +75,8 @@ exports.login = (req, res, next) => {
     .catch((error) => res.status(500).send({ error }));
 };
 
-exports.verify = (req, res, next) => {
-  const { token } = req.params;
-
+exports.verify = async (req, res, next) => {
+  let token = req.params.id;
   if (!token) {
     return res.status(422).send({ message: "Missing Token" });
   }
@@ -92,19 +85,22 @@ exports.verify = (req, res, next) => {
   try {
     payload = jwt.verify(token, process.env.SPHINX_TOKEN_KEY);
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 
   try {
-    const user = User.findOne({ _id: payload.ID }).exec();
+    const user = await User.findOne({ _id: payload.ID }).exec();
+    console.log(payload.ID);
+
     if (!user) {
       return res.status(404).send({ message: "User does not exist" });
     }
 
     user.verified = true;
-
     user.save().then(res.status(200).send({ message: "Account verified" }));
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 };
