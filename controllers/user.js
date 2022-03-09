@@ -13,9 +13,14 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.signup = async (req, res, next) => {
-  const { email, username, password } = req.body;
+  const { email, username, password, confirm_password } = req.body;
 
   let user;
+
+  if (password !== confirm_password) {
+    return res.status(500).send({ message: "Passwords are differents" });
+  }
+
   try {
     const hash = await bcrypt.hash(password, 10);
     user = new User({
