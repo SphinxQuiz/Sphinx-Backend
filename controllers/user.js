@@ -49,13 +49,14 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  const { email, password } = req.body;
+  User.findOne({ email })
     .then((user) => {
       if (!user) {
         return res.status(401).send({ error: "This user does not exist" }); // a finir;
       }
       bcrypt
-        .compare(req.body.password, user.password)
+        .compare(password, user.password)
         .then((valid) => {
           try {
             if (!valid) {
@@ -67,15 +68,24 @@ exports.login = (req, res, next) => {
           } catch (error) {
             return res.status(500).send({ error: "Incorrect password" });
           }
+          const token = jwt.sign(
+            { userId: user._id },
+            process.env.SPHINX_TOKEN_KEY,
+            {
+              expiresIn: "24h",
+            }
+          );
+          res.headers.authorization = token;
           return res.status(200).send({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, SPHINX_TOKEN_KEY, {
-              expiresIn: "24h",
-            }),
+            token,
           });
         })
 
-        .catch((error) => res.status(500).send({ error }));
+        .catch((error) => {
+          console.log(error);
+          res.status(500).send({ error });
+        });
     })
     .catch((error) => res.status(500).send({ error }));
 };

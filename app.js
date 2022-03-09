@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user");
+const loggedRoutes = require("./routes/logged");
 
 mongoose
   .connect(process.env.SPHINX_DB_URL, {
@@ -35,5 +36,6 @@ app.use(
 );
 
 app.use("/api/auth", userRoutes);
+app.use("/", loggedRoutes);
 
 module.exports = app;
