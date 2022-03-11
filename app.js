@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user");
 const questionRoutes = require("./routes/question");
-const loggedRoutes = require("./routes/logged");
 
 mongoose
   .connect(process.env.SPHINX_DB_URL, {
