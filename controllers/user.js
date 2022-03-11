@@ -28,23 +28,29 @@ exports.signup = async (req, res, next) => {
       email,
       password: hash,
     });
-    user.save();
-  } catch (error) {
-    return res.status(500).send({ error });
-  }
+
 
   const verificationToken = user.generateVerificationToken();
   const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
 
-  try {
     await transporter.sendMail({
       to: req.body.email,
       subject: "Verify Sphinx Account",
       html: `Click <a href = '${url}'>here</a> to confirm your email.`,
     });
+
+
+    user.save();
+
   } catch (error) {
-    return res.status(400).send({ error });
+    console.log(error)
+    return res.status(500).send({ error });
   }
+
+
+  
+    
+
   res.status(201).send({ message: `Sent a verification email to ${email}` });
 };
 
@@ -87,7 +93,10 @@ exports.login = (req, res, next) => {
           res.status(500).send({ error });
         });
     })
-    .catch((error) => res.status(500).send({ error }));
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send({ error });
+    });
 };
 
 exports.verify = async (req, res, next) => {
