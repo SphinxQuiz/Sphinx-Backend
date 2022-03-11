@@ -5,7 +5,7 @@ const questionCtrl = require("../controllers/question");
 const auth = require("../middleware/auth")
 
 router.get("/getOne",questionCtrl.getOne);
-router.get("/getFromId/:id",questionCtrl.getOne);
+router.get("/getFromId/:id",questionCtrl.getFromId);
 
 
 module.exports = router;

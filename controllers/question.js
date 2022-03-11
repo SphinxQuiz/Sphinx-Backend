@@ -8,11 +8,11 @@ exports.getOne =  async (req, res, next) => {
         let random = Math.floor(Math.random() * ( nb_questions - 0 + 1))
         //await Question.find().limit(-1).skip(random).next()
         let reponse = await Question.find().skip(random).limit(1)
-        const id = reponse[0]._id
-        const question = reponse[0].question
+        const r = reponse[0]
+        const { id, question, category, type, difficulty} = r
         const reponseTab = []
-        reponseTab.push(reponse[0].correct_answer)
-        reponseTab.push( ... reponse[0].incorrect_answers)
+        reponseTab.push(r.correct_answer)
+        reponseTab.push( ... r.incorrect_answers)
 
         tabSend = []
         let n = reponseTab.length
@@ -26,11 +26,11 @@ exports.getOne =  async (req, res, next) => {
         res.status(200).send({
             id,
             question,
+            category,
+            type,
+            difficulty,
             tabSend
         })
-
-
-
 
     } catch (error) {
         console.log(error)
@@ -41,9 +41,16 @@ exports.getOne =  async (req, res, next) => {
 exports.getFromId =  async (req, res, next) => {
     try {
         let {id} = req.params;
-        let reponse = await Question.find({id})
+        let reponse = await Question.find({_id: id})
 
-        console.log(reponse)
+        const { correct_answer} = reponse[0]
+
+        res.status(201).send({
+            correct_answer
+        })
+        
+
+        
     } catch (error) {
         console.log(error)
         res.status(500).send({error});
