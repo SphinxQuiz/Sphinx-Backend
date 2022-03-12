@@ -53,7 +53,6 @@ exports.signup = async (req, res, next) => {
     });
 
   } catch (error) {
-    console.log(error)
     return res.status(500).send({ error: "Impossible d'envoyer un email a cette addresse" });
   }
   try{
@@ -66,14 +65,21 @@ exports.signup = async (req, res, next) => {
   res.status(201).send({ message: `Sent a verification email to ${email}` });
 };
 
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .then((user) => {
-      if (!user) {
-        return res.status(401).send({ error: "This user does not exist" }); // a finir;
-      }
-      bcrypt
+  let user;
+  try{
+    user = await User.findOne({ email })
+    if (!user) {
+      return res.status(401).send({ error: "This user does not exist" }); // a finir;
+    }
+  } 
+  catch (error) {
+    return res.status(500).send({ error: error });
+  }
+
+  try{
+    let b = bcrypt
         .compare(password, user.password)
         .then((valid) => {
           try {
@@ -98,16 +104,11 @@ exports.login = (req, res, next) => {
             token,
           });
         })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({ error: error });
+  }
 
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send({ error });
-        });
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send({ error });
-    });
 };
 
 exports.verify = async (req, res, next) => {
@@ -126,16 +127,24 @@ exports.verify = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ _id: payload.ID }).exec();
-    console.log(payload.ID);
 
     if (!user) {
       return res.status(404).send({ message: "User does not exist" });
     }
-
-    user.verified = true;
-    user.save().then(res.status(200).send({ message: "Account verified" }));
   } catch (error) {
-    console.log(error);
     return res.status(500).send(error);
   }
+
+  var myquery = { _id: payload.ID };
+  var newvalues = { verified: true };
+
+  try {
+    let u = await User.findByIdAndUpdate(myquery, {verified: true}, {upsert: true})
+      return res.status(200).send({ message: "Account verified" });
+
+  } 
+  catch (error) {
+    return res.status(500).send({ error: error });
+  }
+  
 };
