@@ -81,7 +81,6 @@ exports.login = (req, res, next) => {
               expiresIn: "24h",
             }
           );
-          res.headers.authorization = token;
           return res.status(200).send({
             userId: user._id,
             token,
