@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization;
-    console.log(token)
     const decodedToken = jwt.verify(token, process.env.SPHINX_TOKEN_KEY);
     const userId = decodedToken.userId;
     req.auth = { userId };
