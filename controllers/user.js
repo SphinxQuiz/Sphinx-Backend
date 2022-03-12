@@ -13,13 +13,23 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.signup = async (req, res, next) => {
-  const { email, username, password, confirm_password } = req.body;
+  const { email, username, password} = req.body;
 
   let user;
 
-  if (password !== confirm_password) {
-    return res.status(500).send({ message: "Passwords are differents" });
+  let uWithMail = await User.findOne({ email })
+  if(uWithMail){
+    if (uWithMail) {
+      return res.status(401).send({ error: "email already used" }); // a finir;
+    }
   }
+
+  let uWithUsername = await User.findOne({ username })
+    if(uWithUsername){
+      if (uWithUsername) {
+        return res.status(401).send({ error: "username already used" }); // a finir;
+      }
+    }
 
   try {
     const hash = await bcrypt.hash(password, 10);
@@ -28,8 +38,11 @@ exports.signup = async (req, res, next) => {
       email,
       password: hash,
     });
+  } catch (error) {
+    return res.status(500).send({ error: "username already taken" });
+    }
 
-
+  try{
   const verificationToken = user.generateVerificationToken();
   const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
 
@@ -39,17 +52,16 @@ exports.signup = async (req, res, next) => {
       html: `Click <a href = '${url}'>here</a> to confirm your email.`,
     });
 
-
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({ error: "Impossible d'envoyer un email a cette addresse" });
+  }
+  try{
     user.save();
 
   } catch (error) {
-    console.log(error)
-    return res.status(500).send({ error });
+    return res.status(500).send({ error: error });
   }
-
-
-  
-    
 
   res.status(201).send({ message: `Sent a verification email to ${email}` });
 };
