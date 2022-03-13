@@ -150,6 +150,9 @@ exports.verify = async (req, res, next) => {
 };
 
 exports.getInfo = async (req, res, next) => {
+
+  console.log(req.body)
+
   try {
     
   } catch (error) {

@@ -52,12 +52,12 @@ exports.getFromId = async (req, res, next) => {
     let reponse = await Question.find({ _id: id });
 
     const { correct_answer } = reponse[0];
-
     var myquery = { _id: userId };
-
     let adding = -10;
 
     if(correct_answer === answer){
+
+
 
         if(difficulty === "hard"){
             adding = 30
@@ -68,9 +68,13 @@ exports.getFromId = async (req, res, next) => {
         else if(difficulty == "easy"){
             adding = 10
         }
+        var newvalues = { $inc: { score: adding, goodAnswer: 1}};
+
+    }
+    else{
+        var newvalues = { $inc: { score: adding, badAnswer: 1 }};
     }
 
-    var newvalues = { $inc: { score: adding }};
 
     try {
       let u = await User.findByIdAndUpdate(
