@@ -151,10 +151,26 @@ exports.verify = async (req, res, next) => {
 
 exports.getInfo = async (req, res, next) => {
 
-  console.log(req.body)
+  const { token } = req.body
+
+  if (!token) {
+    res.status(400).send({ error: "You must login" });
+  }
+
+  const decodedToken = jwt.verify(token, process.env.SPHINX_TOKEN_KEY);
+  const userId = decodedToken.userId;
+
+  let u = await User.find({_id: userId})
+
+  let username = u[0].username
+  let score = u[0].score
+  let goodAnswer = u[0].goodAnswer
+  let badAnswer = u[0].badAnswer
+
 
   try {
-    
+    return res.status(200).send({ username, score, goodAnswer, badAnswer  });
+
   } catch (error) {
     return res.status(500).send({ error: error });
   }
