@@ -11,6 +11,9 @@ const userSchema = mongoose.Schema(
     score:{type: Number, default: 0},
     goodAnswer:{type: Number, default: 0},
     badAnswer:{type: Number, default: 0},
+    maxStreak:{type: Number, default: 0},
+    currentStreak:{type: Number, default: 0},
+
     verified: {
       type: Boolean,
       required: true,

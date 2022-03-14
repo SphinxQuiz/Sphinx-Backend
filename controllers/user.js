@@ -160,16 +160,12 @@ exports.getInfo = async (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.SPHINX_TOKEN_KEY);
   const userId = decodedToken.userId;
 
-  let u = await User.find({_id: userId})
+  let u = await User.find({_id: userId}).select("-_id username score goodAnswer badAnswer maxStreak currentStreak")
 
-  let username = u[0].username
-  let score = u[0].score
-  let goodAnswer = u[0].goodAnswer
-  let badAnswer = u[0].badAnswer
 
 
   try {
-    return res.status(200).send({ username, score, goodAnswer, badAnswer  });
+    return res.status(200).send(u);
 
   } catch (error) {
     return res.status(500).send({ error: error });
@@ -178,9 +174,8 @@ exports.getInfo = async (req, res, next) => {
 
 exports.getLeaderboard = async (req, res, next) => {
 
-  let userList = []
 
-  let u = await (User.find().sort({score: -1}).limit(4).select("-_id username score goodAnswer badAnswer"))
+  let u = await (User.find().sort({score: -1}).limit(4).select("-_id username score goodAnswer badAnswer maxStreak currentStreak"))
 
   try {
     return res.status(200).send(u);

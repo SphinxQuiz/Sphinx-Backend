@@ -51,14 +51,20 @@ exports.getFromId = async (req, res, next) => {
     let { id } = req.params;
     let reponse = await Question.find({ _id: id });
 
+    let uInfo = await User.find({_id: userId}).select("-_id maxStreak currentStreak")
+    maxS = uInfo[0].maxStreak
+    currentS = uInfo[0].currentStreak
+
+    console.log(currentS)
+    console.log(maxS)
+
+
     const { correct_answer } = reponse[0];
     var myquery = { _id: userId };
     let adding = -10;
 
     if(correct_answer === answer){
-
-
-
+      currentS += 1
         if(difficulty === "hard"){
             adding = 30
         }
@@ -68,11 +74,18 @@ exports.getFromId = async (req, res, next) => {
         else if(difficulty == "easy"){
             adding = 10
         }
-        var newvalues = { $inc: { score: adding, goodAnswer: 1}};
 
+        if(currentS >= maxS){
+          console.log("test")
+          var newvalues = { $inc: { score: adding, goodAnswer: 1, currentStreak: 1}, $set:{maxStreak: currentS}};
+        }
+        else{
+          var newvalues = { $inc: { score: adding, goodAnswer: 1, currentStreak: 1}};
+
+        }
     }
     else{
-        var newvalues = { $inc: { score: adding, badAnswer: 1 }};
+        var newvalues = { $inc: { score: adding, badAnswer: 1 }, $set: {currentStreak: 0}};
     }
 
 
