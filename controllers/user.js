@@ -180,7 +180,7 @@ exports.getLeaderboard = async (req, res, next) => {
 
   let userList = []
 
-  let u = await (User.find().sort({score: -1}).limit(4).select("-_id username score"))
+  let u = await (User.find().sort({score: -1}).limit(4).select("-_id username score goodAnswer badAnswer"))
 
   try {
     return res.status(200).send(u);
