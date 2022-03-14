@@ -55,10 +55,6 @@ exports.getFromId = async (req, res, next) => {
     maxS = uInfo[0].maxStreak
     currentS = uInfo[0].currentStreak
 
-    console.log(currentS)
-    console.log(maxS)
-
-
     const { correct_answer } = reponse[0];
     var myquery = { _id: userId };
     let adding = -10;
