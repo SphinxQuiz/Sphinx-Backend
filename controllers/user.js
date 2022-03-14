@@ -175,3 +175,17 @@ exports.getInfo = async (req, res, next) => {
     return res.status(500).send({ error: error });
   }
 }
+
+exports.getLeaderboard = async (req, res, next) => {
+
+  let userList = []
+
+  let u = await (User.find().sort({score: -1}).limit(4).select("-_id username score"))
+
+  try {
+    return res.status(200).send(u);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+
+}
