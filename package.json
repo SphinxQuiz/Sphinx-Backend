@@ -11,5 +11,9 @@
     "nodemon": "^2.0.15",
     "xhr2": "^0.2.1",
     "xmlhttprequest": "^1.8.0"
+  },
+  "scripts":{
+    "start": "node server"
   }
 }
+ 
