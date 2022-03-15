@@ -33,4 +33,8 @@ app.use(
 app.use("/api/auth", userRoutes);
 app.use("/api/question", questionRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Hello world")
+})
+
 module.exports = app;
