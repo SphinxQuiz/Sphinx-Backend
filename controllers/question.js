@@ -72,7 +72,6 @@ exports.getFromId = async (req, res, next) => {
         }
 
         if(currentS >= maxS){
-          console.log("test")
           var newvalues = { $inc: { score: adding, goodAnswer: 1, currentStreak: 1}, $set:{maxStreak: currentS}};
         }
         else{
