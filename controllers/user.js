@@ -44,7 +44,7 @@ exports.signup = async (req, res, next) => {
 
   try{
   const verificationToken = user.generateVerificationToken();
-  const url = `http://localhost:3000/api/auth/verify/${verificationToken}`;
+  const url = `${process.env.HEROKULINK}${verificationToken}`;
 
     await transporter.sendMail({
       to: req.body.email,
