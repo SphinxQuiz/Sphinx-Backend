@@ -175,7 +175,7 @@ exports.getInfo = async (req, res, next) => {
 exports.getLeaderboard = async (req, res, next) => {
 
 
-  let u = await (User.find({verify: true}).sort({score: -1}).limit(100).select("-_id username score goodAnswer badAnswer maxStreak currentStreak"))
+  let u = await (User.find({verified: true}).sort({score: -1}).limit(100).select("-_id username score goodAnswer badAnswer maxStreak currentStreak"))
 
   try {
     return res.status(200).send(u);
