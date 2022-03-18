@@ -66,10 +66,11 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
+  console.log(username)
   let user;
   try{
-    user = await User.findOne({ email })
+    user = await User.findOne({ username })
     if (!user) {
       return res.status(401).send({ error: "This user does not exist" }); // a finir;
     }
@@ -99,6 +100,7 @@ exports.login = async (req, res, next) => {
               expiresIn: "24h",
             }
           );
+          
           return res.status(200).send({
             userId: user._id,
             token,
