@@ -200,7 +200,7 @@ exports.signup = async (req, res, next) => {
               <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
 
 
-        <img src = "https://images.unlayer.com/projects/0/1647682391403-apple-splash-2778-1284.jpg" width="500px" />
+        <img src = "https://images.unlayer.com/projects/0/1647682391403-apple-splash-2778-1284.jpg" width="50%" />
         <style>
           img{
             border-radius: 20px
