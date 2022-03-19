@@ -17,19 +17,20 @@ exports.signup = async (req, res, next) => {
 
   let user;
 
+  if(username.length > 20){
+    return res.status(401).send({ error: "Your username is too long" }); // a finir;
+  }
+
   let uWithMail = await User.findOne({ email })
   if(uWithMail){
-    if (uWithMail) {
-      return res.status(401).send({ error: "email already used" }); // a finir;
-    }
+    return res.status(401).send({ error: "email already used" }); // a finir;
   }
 
   let uWithUsername = await User.findOne({ username })
     if(uWithUsername){
-      if (uWithUsername) {
-        return res.status(401).send({ error: "username already used" }); // a finir;
-      }
+      return res.status(401).send({ error: "username already used" }); // a finir;
     }
+
 
   try {
     const hash = await bcrypt.hash(password, 10);
@@ -199,9 +200,10 @@ exports.signup = async (req, res, next) => {
             <tr>
               <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif;" align="left">
 
-
-        <img src = "https://images.unlayer.com/projects/0/1647682391403-apple-splash-2778-1284.jpg" width="50%" />
-        <style>
+        <div align="center">  
+          <img src = "https://images.unlayer.com/projects/0/1647682391403-apple-splash-2778-1284.jpg" width="50%" />
+        </div>
+          <style>
           img{
             border-radius: 20px
           }
@@ -314,7 +316,6 @@ exports.signup = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   const { username, password } = req.body;
-  console.log(username)
   let user;
   try{
     user = await User.findOne({ username })
@@ -349,6 +350,7 @@ exports.login = async (req, res, next) => {
           );
           
           return res.status(200).send({
+            username,
             userId: user._id,
             token,
           });
@@ -412,8 +414,6 @@ exports.getInfo = async (req, res, next) => {
 
   let u = await User.find({_id: userId}).select("-_id username score goodAnswer badAnswer maxStreak currentStreak")
 
-
-
   try {
     return res.status(200).send(u);
 
@@ -423,7 +423,6 @@ exports.getInfo = async (req, res, next) => {
 }
 
 exports.getLeaderboard = async (req, res, next) => {
-
 
   let u = await (User.find({verified: true}).sort({score: -1}).limit(100).select("-_id username score goodAnswer badAnswer maxStreak currentStreak"))
 
