@@ -309,7 +309,7 @@ exports.signup = async (req, res, next) => {
     return res.status(500).send({ error: error });
   }
 
-  res.status(201).send({ message: `Sent a verification email to ${email}` });
+  res.status(201).send({ message: `Sent a verification email to ${email} \n(Check the spams if you don't see it)` });
 };
 
 exports.login = async (req, res, next) => {
